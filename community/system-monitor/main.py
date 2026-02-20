@@ -1,6 +1,5 @@
 import json
 import os
-import platform
 import shutil
 
 import psutil
@@ -146,7 +145,7 @@ def get_uptime():
 def get_full_snapshot():
     """Collect all system metrics into one dict."""
     snapshot = {
-        "platform": platform.platform(),
+        "platform": os.uname().sysname + " " + os.uname().release,
         "uptime": get_uptime(),
         "cpu": get_cpu_info(),
         "memory": get_memory_info(),
@@ -186,7 +185,12 @@ class SystemMonitorCapability(MatchingCapability):
     def _log(self, level, msg):
         try:
             handler = self.worker.editor_logging_handler
-            getattr(handler, level, handler.info)(f"[SystemMonitor] {msg}")
+            if level == "error":
+                handler.error(f"[SystemMonitor] {msg}")
+            elif level == "warning":
+                handler.warning(f"[SystemMonitor] {msg}")
+            else:
+                handler.info(f"[SystemMonitor] {msg}")
         except Exception:
             pass
 
