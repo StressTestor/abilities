@@ -137,7 +137,12 @@ class HackerNewsReaderCapability(MatchingCapability):
     def _log(self, level, msg):
         try:
             handler = self.worker.editor_logging_handler
-            getattr(handler, level, handler.info)(f"[HackerNews] {msg}")
+            if level == "error":
+                handler.error(f"[HackerNews] {msg}")
+            elif level == "warning":
+                handler.warning(f"[HackerNews] {msg}")
+            else:
+                handler.info(f"[HackerNews] {msg}")
         except Exception:
             pass
 
